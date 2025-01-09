@@ -53,7 +53,7 @@ AIChatDialog::AIChatDialog(QWidget *parent) :
     layout->addWidget(answerOutput);
 
     layout->addWidget(taskInput);
-    layout->addWidget(dateEdit);  // 加入日期選擇控件
+    layout->addWidget(dateEdit);
     layout->addWidget(addTaskButton);
     layout->addWidget(taskListWidget);
     setLayout(layout);
@@ -63,9 +63,7 @@ AIChatDialog::AIChatDialog(QWidget *parent) :
     connect(addTaskButton, &QPushButton::clicked, this, &AIChatDialog::onAddTaskClicked);
     connect(taskListWidget, &QListWidget::itemChanged, this, &AIChatDialog::onTaskCompleted);
 
-    // 設定網絡管理器
-    networkManager = new QNetworkAccessManager(this);
-    connect(networkManager, &QNetworkAccessManager::finished, this, &AIChatDialog::onNetworkReply);
+
 
     // 載入任務列表
     loadTasks();
@@ -82,51 +80,9 @@ void AIChatDialog::onAskClicked() {
         // 模擬AI回應
         answerOutput->append("AI: " + question + " is a good question!");
     }
-    /*QString question = questionInput->text();
-    if (question.isEmpty()) {
-        return;
-    }
 
-    // 設定 API 請求內容，使用 gpt-3.5-turbo 模型
-    QJsonObject json;
-    json["model"] = "gpt-3.5-turbo";  // 使用 gpt-3.5-turbo 模型
-    QJsonArray messages;
-    QJsonObject userMessage;
-    userMessage["role"] = "user";
-    userMessage["content"] = question;
-    messages.append(userMessage);
-    json["messages"] = messages;
-
-    QNetworkRequest request(QUrl("https://api.openai.com/v1/chat/completions"));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization", "Bearer YOUR_API_KEY");  // 使用你的 API 金鑰
-
-    // 發送 POST 請求
-    networkManager->post(request, QJsonDocument(json).toJson());*/
 }
 
-void AIChatDialog::onNetworkReply(QNetworkReply* reply) {
-    if (reply->error() != QNetworkReply::NoError) {
-        // 輸出錯誤訊息，了解發生了什麼問題
-        answerOutput->append("Error: " + reply->errorString());
-        answerOutput->append("Details: " + reply->readAll());
-    } else {
-        QByteArray responseData = reply->readAll();
-        QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
-        if (jsonDoc.isObject()) {
-            QJsonObject jsonObject = jsonDoc.object();
-            if (jsonObject.contains("choices") && jsonObject["choices"].isArray()) {
-                QString aiResponse = jsonObject["choices"].toArray()[0].toObject()["message"].toObject()["content"].toString();
-                answerOutput->append("AI: " + aiResponse);
-            } else {
-                answerOutput->append("Unexpected response format.");
-            }
-        } else {
-            answerOutput->append("Invalid JSON response.");
-        }
-    }
-    reply->deleteLater();
-}
 
 // 新增任務
 void AIChatDialog::onAddTaskClicked() {
@@ -147,10 +103,8 @@ void AIChatDialog::onAddTaskClicked() {
 void AIChatDialog::onTaskCompleted(QListWidgetItem* item) {
     if (item->checkState() == Qt::Checked) {
         item->setBackground(QBrush(QColor(Qt::green)));  // 任務完成，顯示綠色
-        //item->setText(item->text().remove(" (未完成)") + " (已完成)");  // 顯示 "已完成"
     } else {
         item->setBackground(QBrush(QColor(Qt::white)));  // 任務未完成，顯示白色
-        //item->setText(item->text().remove(" (已完成)").remove(" (未完成)"));  // 顯示 "未完成"
     }
 }
 
@@ -178,15 +132,15 @@ void AIChatDialog::loadTasks() {
     int taskCount = settings.beginReadArray("tasks");
     for (int i = 0; i < taskCount; ++i) {
         settings.setArrayIndex(i);
-        QString taskText = settings.value("taskText").toString();
+        //QString taskText = settings.value("taskText").toString();
         bool isChecked = settings.value("isChecked").toBool();
         QString taskDate = settings.value("taskDate").toString();
 
         // 顯示日期
-        QListWidgetItem *item = new QListWidgetItem(taskText + " - " + taskDate);
+        QListWidgetItem *item = new QListWidgetItem(taskDate);
         item->setCheckState(isChecked ? Qt::Checked : Qt::Unchecked);
         item->setBackground(isChecked ? QBrush(QColor(Qt::green)) : QBrush(QColor(Qt::white)));
-        item->setText(isChecked ? taskText + " (已完成) - " + taskDate : taskText + " (未完成) - " + taskDate);  // 顯示狀態和日期
+
         taskListWidget->addItem(item);
     }
     settings.endArray();
@@ -202,7 +156,7 @@ void AIChatDialog::saveTasks() {
         settings.setValue("isChecked", item->checkState() == Qt::Checked);
 
         // 儲存任務的日期
-        QString date = item->text().section('-', 1, 1).trimmed();
+        QString date = item->text();
         settings.setValue("taskDate", date);
     }
     settings.endArray();
