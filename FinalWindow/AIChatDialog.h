@@ -21,7 +21,7 @@ public:
 
 private slots:
     void onAskClicked();
-    void onNetworkReply(QNetworkReply* reply);
+    //void onNetworkReply(QNetworkReply* reply);
     void onAddTaskClicked();  // 新增任務的槽函數
     void onTaskCompleted(QListWidgetItem* item);  // 標註任務為完成的槽函數
     void onRemoveTask();  // 刪除任務的槽函數
