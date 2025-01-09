@@ -14,8 +14,8 @@
 	將待辦事項儲存起來，關閉後再次開啟時仍可讀取。
 5.	篩選功能
 6.	顯示「已完成」或「未完成」事項
-	引入 AI API
-7.	利用現有的 AI 平台（如 OpenAI API、Azure OpenAI、Google Bard）處理自然語言請求。
+	
+7.	引入 AI API，利用現有的 AI 平台（如 OpenAI API、Azure OpenAI、Google Bard）處理自然語言請求。
 	使用 Qt Network 模塊來與 AI API 進行交互。
 8.	AI 問題解決介面
 	在每個任務旁添加「求助」按鈕，點擊後彈出對話框，讓用戶描述困難。
